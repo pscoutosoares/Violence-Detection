@@ -1,4 +1,5 @@
 from ctypes import *
+from sort import *
 import math
 import random
 import os
@@ -93,6 +94,9 @@ def YOLO():
     # Create an image we reuse for each detect
     # Video default size (640x480)
     darknet_image = darknet.make_image(640,480,3)
+
+    #Inicializar o Sort
+    mot_tracker = Sort()
     while True:
         
         prev_time = time.time()
@@ -107,7 +111,11 @@ def YOLO():
         darknet.copy_image_from_bytes(darknet_image,frame_resized.tobytes())
 
         detections = darknet.detect_image(netMain, metaMain, darknet_image, thresh=0.25)
-        image = cvDrawBoxes(detections, frame_resized)
+        print(detections)
+        #Sort Track update
+        track_bbs_ids = mot_tracker.update(detections)
+
+        image = cvDrawBoxes(track_bbs_ids, frame_resized)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         #print(1/(time.time()-prev_time))
         cv2.imshow('Demo', image)
