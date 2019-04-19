@@ -32,6 +32,7 @@ import math
 import random
 import os
 
+
 def sample(probs):
     s = sum(probs)
     probs = [a/s for a in probs]
@@ -226,6 +227,13 @@ def classify(net, meta, im):
     res = sorted(res, key=lambda x: -x[1])
     return res
 
+def convertBack(x, y, w, h):
+    xmin = int(round(x - (w / 2)))
+    xmax = int(round(x + (w / 2)))
+    ymin = int(round(y - (h / 2)))
+    ymax = int(round(y + (h / 2)))
+    return xmin, ymin, xmax, ymax
+
 def detect(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45, debug= False):
     """
     Performs the meat of the detection
@@ -239,6 +247,7 @@ def detect(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45, debug= False):
     return ret
 
 def detect_image(net, meta, im, thresh=.5, hier_thresh=.5, nms=.45, debug= False):
+    import numpy as np
     #import cv2
     #custom_image_bgr = cv2.imread(image) # use: detect(,,imagePath,)
     #custom_image = cv2.cvtColor(custom_image_bgr, cv2.COLOR_BGR2RGB)
@@ -260,7 +269,7 @@ def detect_image(net, meta, im, thresh=.5, hier_thresh=.5, nms=.45, debug= False
     if nms:
         do_nms_sort(dets, num, meta.classes, nms)
     if debug: print("did sort")
-    res = []
+    res = np.zeros(5)
     if debug: print("about to range")
     for j in range(num):
         if debug: print("Ranging on "+str(j)+" of "+str(num))
@@ -278,7 +287,8 @@ def detect_image(net, meta, im, thresh=.5, hier_thresh=.5, nms=.45, debug= False
                     print(nameTag)
                     print(dets[j].prob[i])
                     print((b.x, b.y, b.w, b.h))
-                res.append((nameTag, dets[j].prob[i], (b.x, b.y, b.w, b.h)))
+                xmin, ymin, xmax, ymax = convertBack(float(b.x), float(b.y), float(b.w), float(b.h))
+                res = np.append(res, ([xmin, ymin, xmax, ymax, [nameTag, dets[j].prob[i]]]), axis=0)
     if debug: print("did range")
     res = sorted(res, key=lambda x: -x[1])
     if debug: print("did sort")
