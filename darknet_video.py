@@ -12,13 +12,11 @@ import darknet
 def cvDrawBoxes(detections, img):
     ide = 0
     for detection in detections:
-        xmin, ymin, xmax, ymax = detection[0],detection[1],detection[2],detection[3]
+        xmin, ymin, xmax, ymax = int(detection[0]),int(detection[1]),int(detection[2]),int(detection[3])
         pt1 = (xmin, ymin)
         pt2 = (xmax, ymax)
         cv2.rectangle(img, pt1, pt2, (0, 255, 0), 1)
-        cv2.putText(img, str(ide) +
-                    detection[4][0].decode() +
-                    " [" + str(round(detection[4][1] * 100, 2)) + "]",
+        cv2.putText(img, "ID:"+ str(detection[4]) ,
                     (pt1[0], pt1[1] - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                     [0, 255, 0], 2)
         ide += 1
@@ -98,8 +96,7 @@ def YOLO():
 
         darknet.copy_image_from_bytes(darknet_image,frame_resized.tobytes())
 
-        detections = darknet.detect_image(netMain, metaMain, darknet_image, thresh=0.25)
-        print(detections)
+        detections = darknet.detect_image(netMain, metaMain, darknet_image, thresh=0.15)
         #Sort Track update
         track_bbs_ids = mot_tracker.update(detections)
 

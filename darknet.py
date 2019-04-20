@@ -269,7 +269,8 @@ def detect_image(net, meta, im, thresh=.5, hier_thresh=.5, nms=.45, debug= False
     if nms:
         do_nms_sort(dets, num, meta.classes, nms)
     if debug: print("did sort")
-    res = np.zeros(5)
+    res = []
+    
     if debug: print("about to range")
     for j in range(num):
         if debug: print("Ranging on "+str(j)+" of "+str(num))
@@ -287,10 +288,16 @@ def detect_image(net, meta, im, thresh=.5, hier_thresh=.5, nms=.45, debug= False
                     print(nameTag)
                     print(dets[j].prob[i])
                     print((b.x, b.y, b.w, b.h))
-                xmin, ymin, xmax, ymax = convertBack(float(b.x), float(b.y), float(b.w), float(b.h))
-                res = np.append(res, ([xmin, ymin, xmax, ymax, [nameTag, dets[j].prob[i]]]), axis=0)
+
+                #apenas permite o uso da classe person; Refatorar 
+                if(str(nameTag) == "b'person'"):
+                    #print("aeho")
+                    xmin, ymin, xmax, ymax = convertBack(float(b.x), float(b.y), float(b.w), float(b.h))
+                    temp_np_array = np.array([xmin, ymin, xmax, ymax,0,[nameTag,dets[j].prob[i]]])
+                    res.append(temp_np_array)
+    res = np.asarray(res)
     if debug: print("did range")
-    res = sorted(res, key=lambda x: -x[1])
+    #res = sorted(res, key=lambda x: -x[1])
     if debug: print("did sort")
     free_detections(dets, num)
     if debug: print("freed detections")
