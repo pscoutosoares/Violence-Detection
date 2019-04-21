@@ -291,7 +291,6 @@ def detect_image(net, meta, im, thresh=.5, hier_thresh=.5, nms=.45, debug= False
 
                 #apenas permite o uso da classe person; Refatorar 
                 if(str(nameTag) == "b'person'"):
-                    #print("aeho")
                     xmin, ymin, xmax, ymax = convertBack(float(b.x), float(b.y), float(b.w), float(b.h))
                     temp_np_array = np.array([xmin, ymin, xmax, ymax,0,[nameTag,dets[j].prob[i]]])
                     res.append(temp_np_array)

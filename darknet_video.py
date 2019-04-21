@@ -28,8 +28,11 @@ metaMain = None
 altNames = None
 
 
-def YOLO():
-
+def YOLO(vid_input,vid_output):
+    '''
+    vid_input: Directory of video input. Example: vid_input = "input/001.wmv".
+    vid_output: Directory of video output. Example: vid_output = "output/001.avi".
+    '''
     global metaMain, netMain, altNames
     configPath = "./cfg/yolov3.cfg"
     weightPath = "./yolov3.weights"
@@ -69,11 +72,11 @@ def YOLO():
         except Exception:
             pass
     #cap = cv2.VideoCapture(0)
-    cap = cv2.VideoCapture("samples/001.wmv")
+    cap = cv2.VideoCapture(vid_input)
     cap.set(3, 1280)
     cap.set(4, 720)
     out = cv2.VideoWriter(
-        "outputs/001.avi", cv2.VideoWriter_fourcc(*"MJPG"), 24.0,
+        vid_output, cv2.VideoWriter_fourcc(*"MJPG"), 24.0,
         (640, 480))
     print("Starting the YOLO loop...")
 
@@ -96,7 +99,7 @@ def YOLO():
 
         darknet.copy_image_from_bytes(darknet_image,frame_resized.tobytes())
 
-        detections = darknet.detect_image(netMain, metaMain, darknet_image, thresh=0.15)
+        detections = darknet.detect_image(netMain, metaMain, darknet_image, thresh=0.30)
         #Sort Track update
         track_bbs_ids = mot_tracker.update(detections)
 
@@ -110,4 +113,6 @@ def YOLO():
     out.release()
 
 if __name__ == "__main__":
-    YOLO()
+    vid_input = "samples/07.wmv"
+    vid_output =  "outputs/007.avi"
+    YOLO(vid_input,vid_output)
